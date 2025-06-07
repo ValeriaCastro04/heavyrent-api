@@ -1,20 +1,18 @@
-import { Controller, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
+    constructor(private authService: AuthService) { }
+
     @Get('google')
-    @UseGuards(AuthGuard('google')) 
-    async googleAuth() {
-        // Este método inicia el flujo de autenticación con Google
-        // No necesita hacer nada aquí, Passport se encargará de redirigir al usuario
-    }
+    @UseGuards(AuthGuard('google'))
+    async googleAuth() { }
+
     @Get('google/redirect')
     @UseGuards(AuthGuard('google'))
-    googleAuthRedirect(@Req() req) {
-        return {
-            mensaje: 'Login con Google exitoso',
-            usuario: req.user,
-        };
+    async googleAuthRedirect(@Req() req) {
+        return this.authService.validateOAuthLogin(req.user.email, req.user.name);
     }
 }
